@@ -1,26 +1,13 @@
 import React from 'react';
-
-function App() {
-  return (
-    <div>
-      <h1>Hello Ishimwe!</h1>
-      <p>This is your custom React project. 🚀</p>
-    </div>
-  );
-}
-    export default App;   
-import React from 'react';
-// Import necessary components and libraries
-import { BrowserRouter as Router, Routes, Route, Link, useParams, useNavigate } from 'react-router-dom';
-import './App.css';
+import { BrowserRouter as Router, Routes, Route, Link, useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect, createContext, useContext } from 'react';
-// Set the document title for the app 
+
 document.title = "Voici App";
 
 const delay = ms => new Promise(res => setTimeout(res, ms));
 
 const AuthContext = createContext();
-const LanguageContext = createContext({ lang: 'en', setLang: () => {} });   
+const LanguageContext = createContext({ lang: 'en', setLang: () => {} });
 
 const translations = {
   en: {
@@ -40,14 +27,17 @@ const translations = {
     profile: 'Profile',
     posts: 'Posts',
     followers: 'Followers',
+    nonFollowers: 'Non Followers',
+    following: 'Following',
     like: 'Like',
+    nonLike: 'Unlike',
     retweet: 'Retweet',
     comments: 'Comments',
     views: 'Views',
     language: 'Language',
     english: 'English',
     french: 'French',
-    aiAssistant: 'AI Assistant',
+    aiAssistant: 'AI Assistant, Chat GPT',
     save: 'Save',
     writePost: 'Write your post here...',
     enhancing: 'Enhancing...',
@@ -78,10 +68,11 @@ const translations = {
     posts: 'Publications',
     followers: 'Abonnés',
     like: 'J’aime',
+    nonLike: 'Non abonnés',
+    following: 'Abonnements',
     retweet: 'Retweeter',
     comments: 'Commentaires',
-    views: 'Vues',
-    language: 'Langue',
+    views: 'Vues',    language: 'Langue',
     english: 'Anglais',
     french: 'Français',
     aiAssistant: "Assistant IA",
@@ -95,17 +86,15 @@ const translations = {
     emailRegistered: 'Email déjà enregistré',
     avatar: 'Avatar',
     search: 'Rechercher des posts ou utilisateurs...',
-    addImageOrVideo: 'Ajouter une image ou une vidéo' 
+    addImageOrVideo: 'Ajouter une image ou une vidéo'
   }
 };
 
 function useTranslate() {
-  // Custom hook to get the translation function based on current language    
   const { lang } = useContext(LanguageContext);
   return key => translations[lang][key] || key;
 }
 
-// --- Mock Backend Data ---
 let mockUsers = [
   { id: '1', username: 'alice', email: 'alice@example.com', password: '123', bio: 'Hello! I am Alice.', followers: ['2'], theme: 'light', avatar: '' },
   { id: '2', username: 'bob', email: 'bob@example.com', password: '123', bio: 'Bob here.', followers: [], theme: 'dark', avatar: '' }
@@ -117,17 +106,13 @@ let mockPosts = [
 ];
 
 function formatDate(ts) {
-  // Format timestamp to a readable date string 
   if (!ts) return '';
   const d = new Date(ts);
   return d.toLocaleString(undefined, {
     year: 'numeric', month: 'short', day: 'numeric',
   });
 }
-<div className="ai-assistant-header">
-  <h2>AI Assistant</h2>
-  <button onClick={onClose} style={{ float: 'right' }}>X</button>
-</div>
+
 function NotificationPopup({ notification, onClose }) {
   if (!notification) return null;
   return (
@@ -137,13 +122,13 @@ function NotificationPopup({ notification, onClose }) {
       top: 30,
       right: 30,
       background: '#fff',
-      border: '1px solidrgb(89, 29, 242)',
+      border: '1px solid rgb(55, 7, 177)',
       borderRadius: 8,
       boxShadow: '0 2px 8px #0002',
       transform: 'translateX(-50%)',
       padding: '16px 24px',
       zIndex: 2000,
-      display: 'flex',  
+      display: 'flex',
       minWidth: 220
     }}>
       <b style={{ color: '#591df2' }}>Notification</b>
@@ -183,7 +168,7 @@ function TrendingSidebar({ posts }) {
             <span style={{ color: '#1da1f2', fontWeight: 'bold' }}>{tag}</span> ({count})
           </li>
         ))}
-        {trending.length === 0 && <li style={{ color: '#888' }}>No hashtags yet</li>}               
+        {trending.length === 0 && <li style={{ color: '#888' }}>No hashtags yet</li>}
       </ul>
     </div>
   );
@@ -226,7 +211,6 @@ function DirectMessageModal({ open, onClose, users, onSend }) {
 }
 
 function AuthProvider({ children }) {
-  // Context provider for authentication state and methods  
   const [user, setUser] = useState(null);
 
   const login = async (email, password) => {
@@ -249,7 +233,6 @@ function AuthProvider({ children }) {
   };
 
   const logout = () => {
-    // Clear user state on logout 
     setUser(null);
   };
 
@@ -257,25 +240,22 @@ function AuthProvider({ children }) {
 }
 
 function AIAssistant({ open, onClose }) {
-  // Simple AI assistant component that simulates a chat interface
   const t = useTranslate();
   const [messages, setMessages] = useState([
-    { from: 'user', text: "Hi AI, can you help me?" },  
+    { from: 'user', text: "Hi AI, can you help me?" },
     { from: 'ai', text: "Hello! I'm your AI assistant. How can I help you?" }
   ]);
-  const [input, setInput] = useState(''); 
-  const [loading, setLoading] = useState(false);    
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
-    // Reset input when assistant is closed
     if (!open) {
       setInput('');
     }
-  }, [open]);     
+  }, [open]);
 
   function sendMessage() {
-    // Handle sending a message in the AI assistant chat
     if (!input.trim()) return;
-    setMessages(msgs => [   
+    setMessages(msgs => [
       ...msgs,
       { from: 'user', text: input },
       { from: 'ai', text: "I'm just a demo AI. You said: " + input }
@@ -284,15 +264,15 @@ function AIAssistant({ open, onClose }) {
     setLoading(true);
   }
 
-  if (!open) return null; 
+  if (!open) return null;
   return (
-    <div style={{   
+    <div style={{
       position: 'fixed', bottom: 20, right: 20, width: 300, background: '#fff',
       border: '1px solid #ccc', borderRadius: 8, boxShadow: '0 2px 8px #0002', zIndex: 1000
     }}>
       <div style={{ padding: 10, borderBottom: '1px solid #eee', fontWeight: 'bold' }}>
         {t('aiAssistant')}
-        {loading && <span style={{ marginLeft: 10, color: '#888' }}>Loading...</span>}    
+        {loading && <span style={{ marginLeft: 10, color: '#888' }}>Loading...</span>}
         <button onClick={onClose} style={{ float: 'right' }}>X</button>
       </div>
       <div style={{ maxHeight: 200, overflowY: 'auto', padding: 10 }}>
@@ -315,19 +295,18 @@ function AIAssistant({ open, onClose }) {
           placeholder="Type a message..."
         />
         <button onClick={sendMessage} style={{ marginLeft: 5 }}>{t('submitPost')}</button>
-      </div>  
-    </div>      
-  );    
-}   
+      </div>
+    </div>
+  );
+}
 
 function Login() {
-  // Login component for user authentication
   const t = useTranslate();
   const auth = useContext(AuthContext);
   const nav = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState(''); 
+  const [error, setError] = useState('');
 
   async function onSubmit(e) {
     e.preventDefault();
@@ -339,14 +318,14 @@ function Login() {
   return (
     <div>
       <h2>{t('login')}</h2>
-      <form onSubmit={onSubmit}>  
+      <form onSubmit={onSubmit}>
         <input placeholder={t('email')} value={email} onChange={e => setEmail(e.target.value)} /><br/>
         <input type="password" placeholder={t('password')} value={password} onChange={e => setPassword(e.target.value)} /><br/>
         <button type="submit">{t('login')}</button>
       </form>
       {error && <p style={{color:'red'}}>{error}</p>}
       <p><Link to="/register">{t('register')}</Link></p>
-      <p><Link to="/">{t('home')}</Link></p>  
+      <p><Link to="/">{t('home')}</Link></p>
     </div>
   );
 }
@@ -354,28 +333,24 @@ function Login() {
 function Register() {
   const t = useTranslate();
   const auth = useContext(AuthContext);
-  // Register component for new user sign-up
   const nav = useNavigate();
-  // State variables for registration form inputs
   const [username, setUsername] = useState('');
-  // State variables for registration form inputs
   const [email, setEmail] = useState('');
-  // State variables for registration form inputs
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
 
   async function onSubmit(e) {
     e.preventDefault();
     const ok = await auth.register(username, email, password);
-    if (ok) nav('/'); 
-    else setError(t('emailRegistered'));  
+    if (ok) nav('/');
+    else setError(t('emailRegistered'));
   }
 
   return (
     <div>
       <h2>{t('register')}</h2>
       <p>{t('registerDescription')}</p>
-      <form onSubmit={onSubmit  }>  
+      <form onSubmit={onSubmit}>
         <input placeholder={t('username')} value={username} onChange={e => setUsername(e.target.value)} /><br/>
         <input placeholder={t('email')} value={email} onChange={e => setEmail(e.target.value)} /><br/>
         <input type="password" placeholder={t('password')} value={password} onChange={e => setPassword(e.target.value)} /><br/>
@@ -388,20 +363,15 @@ function Register() {
   );
 }
 
-// --- Home Page (Feed) with Comments, Avatars, Media, and Search ---
 function Home({ showNotification }) {
   const t = useTranslate();
-  // Home component that displays the feed of posts
   const auth = useContext(AuthContext);
-  // State variables for posts, comment inputs, and search
   const [posts, setPosts] = useState([]);
-  // State variables for comment inputs
   const [commentInputs, setCommentInputs] = useState({});
   const [search, setSearch] = useState('');
   const nav = useNavigate();
 
   useEffect(() => {
-    // Initialize posts from mock data on component mount
     setPosts([...mockPosts]);
   }, []);
 
@@ -545,7 +515,6 @@ function Home({ showNotification }) {
   );
 }
 
-// --- Post Create Page with AI assistant and Media Upload ---
 function PostCreate() {
   const t = useTranslate();
   const auth = useContext(AuthContext);
@@ -631,7 +600,6 @@ function PostCreate() {
   );
 }
 
-// --- Profile Page with Avatar Upload ---
 function Profile({ showNotification }) {
   const t = useTranslate();
   const { username } = useParams();
@@ -641,7 +609,7 @@ function Profile({ showNotification }) {
   const [isFollowing, setIsFollowing] = useState(false);
   const [avatar, setAvatar] = useState('');
   const auth = useContext(AuthContext);
-
+  const nav = useNavigate();
   useEffect(() => {
     const found = mockUsers.find(u => u.username === username);
     if (found) {
@@ -815,4 +783,6 @@ function App() {
       </AuthProvider>
     </LanguageContext.Provider>
   );
-          }
+}
+
+export default App;
